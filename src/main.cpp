@@ -1,7 +1,11 @@
 #include <iostream>
+#include "parser.h"
 
 int main() {
 
-    std::cout << "Hi, I'm the HASM - Hack Assembler";
+    Parser parser("Pong.asm");
+    TokenStream ts;
+    parser.parse(ts);
+    parser.print_labels();
     return 0;
 }

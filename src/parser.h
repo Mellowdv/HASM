@@ -53,4 +53,5 @@ public:
     void second_pass(TokenStream &ts);
     void add_label(TokenStream &ts);
     void print_labels();
+    std::unordered_map<std::string, int> get_labels() const { return labels; };
 };

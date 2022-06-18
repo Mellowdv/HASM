@@ -1,7 +1,13 @@
+#ifndef PARSER_H
+#define PARSER_H
+
 #include <string>
 #include <vector>
 #include <fstream>
 #include <unordered_map>
+
+// Forward declaration
+class Decoder;
 
 const char A_INSTRUCTION = 'A';
 const char L_INSTRUCTION = 'L';
@@ -41,17 +47,15 @@ public:
 class Parser {
 private:
     std::ifstream asm_file {};
-    std::unordered_map<std::string, int> labels {};
     int current_rom_location {};
 
 public:
     Parser(std::string file_name);
-    void parse(TokenStream &ts);
+    void parse(Decoder &d, TokenStream &ts);
     bool has_more_lines();
     void advance(TokenStream &ts);
-    void first_pass(TokenStream &ts);
+    void first_pass(Decoder &d, TokenStream &ts);
     void second_pass(TokenStream &ts);
-    void add_label(TokenStream &ts);
-    void print_labels();
-    std::unordered_map<std::string, int> get_labels() const { return labels; };
 };
+
+#endif

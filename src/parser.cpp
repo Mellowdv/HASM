@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "decoder.h"
 #include <sstream>
 #include <iostream>
 
@@ -71,8 +72,6 @@ Token TokenStream::get_token() const {
         return line.at(0);
 }
 
-
-
 // Parser
 
 Parser::Parser(std::string file_name) {
@@ -82,10 +81,11 @@ Parser::Parser(std::string file_name) {
     }
 }
 
-void Parser::parse(TokenStream &ts) {
+void Parser::parse(Decoder &d, TokenStream &ts) {
     advance(ts);
-    Parser::first_pass(ts);
-    asm_file.seekg(0); 
+    Parser::first_pass(d, ts);
+    asm_file.clear();
+    asm_file.seekg(0, asm_file.beg);
     Parser::second_pass(ts);
     asm_file.close();
 }
@@ -113,19 +113,20 @@ void Parser::advance(TokenStream &ts) {
     }
     // move the counter forward to keep track of the location
 }
-void Parser::first_pass(TokenStream &ts) {
+void Parser::first_pass(Decoder &d, TokenStream &ts) {
     // if instruction type != L, skip to the next line
     // if instruction is L type, add to the labels list
     // adding to the list happens on the first available memory location
     while (has_more_lines())
     {
-        if (ts.peek_type() != 'L') {
+        if (ts.peek_type() != L_INSTRUCTION) {
             ts.clear_tokens();
             advance(ts);
         }
         // else add stuff to the hashmap
         else {
-            add_label(ts);
+            Token t = ts.get_token();
+            d.add_label(t.get_symbol(), t.get_value());
             ts.clear_tokens();
             advance(ts);
         }
@@ -134,18 +135,13 @@ void Parser::first_pass(TokenStream &ts) {
 
 void Parser::second_pass(TokenStream &ts) {
     // go through the file a second time
+    ts.clear_tokens();
+    while (has_more_lines()) 
+    {
+        advance(ts);
+                       
+    }
     // construct lines in TokenStream
     // call coder on the line to transform into binary
     // coder writes into the output file
-}
-
-void Parser::add_label(TokenStream &ts) {
-    Token t = ts.get_token();
-    labels.emplace(t.get_symbol(), t.get_value() + 1);   
-}
-
-void Parser::print_labels() {
-    for (auto it: labels) {
-        std::cout << it.first << " " << it.second << std::endl;
-    }
 }

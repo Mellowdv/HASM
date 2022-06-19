@@ -34,8 +34,8 @@ enum Registers {
 class Decoder {
 private:
     std::ofstream bin_file {};
-    int current_ram_location {};
-    std::unordered_map<std::string, int> labels {};
+    int current_ram_location {16};
+    std::unordered_map<std::string, unsigned int> labels {};
     std::unordered_map<std::string, unsigned int> variables {};
 
 public:
@@ -50,7 +50,7 @@ public:
     void add_label(std::string s, int n);
     void print_labels();
     void print_variables();
-    std::unordered_map<std::string, int> get_labels() const { return labels; };
+    std::unordered_map<std::string, unsigned int> get_labels() const { return labels; };
 };
 
 #endif

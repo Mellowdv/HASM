@@ -17,14 +17,14 @@ class Token {
 private:
     std::string symbol;
     char instruction_type;
-    int value;
+    unsigned int value;
 
 public:
     Token(std::string s, char inst_type): symbol{s}, instruction_type{inst_type} {}
-    Token(std::string s, char inst_type, int mem_loc): symbol{s}, instruction_type{inst_type}, value{mem_loc} {}
+    Token(std::string s, char inst_type, unsigned int mem_loc): symbol{s}, instruction_type{inst_type}, value{mem_loc} {}
     // getters and setters
     std::string get_symbol() const { return symbol; }
-    int get_value() const { return value; }
+    unsigned int get_value() const { return value; }
     char get_instr_type() const { return instruction_type; }
     void set_symbol(std::string s) { symbol = s; }
     void set_value(int n) { value = n; }
@@ -38,7 +38,7 @@ private:
 
 public:
     TokenStream() {}
-    void add_token(std::string input, int rom_location);
+    void add_token(std::string input, unsigned int rom_location);
     void clear_tokens();
     Token get_token() const;
     char peek_type() const;
@@ -47,7 +47,7 @@ public:
 class Parser {
 private:
     std::ifstream asm_file {};
-    int current_rom_location {};
+    unsigned int current_rom_location {};
 
 public:
     Parser(std::string file_name);
@@ -55,7 +55,7 @@ public:
     bool has_more_lines();
     void advance(TokenStream &ts);
     void first_pass(Decoder &d, TokenStream &ts);
-    void second_pass(TokenStream &ts);
+    void second_pass(Decoder &d, TokenStream &ts);
 };
 
 #endif

@@ -28,7 +28,7 @@ std::string prep_input(std::string s) {
 
 // TokenStream
 
-void TokenStream::add_token(std::string input, int rom_location) {
+void TokenStream::add_token(std::string input, unsigned int rom_location) {
     // stuff happening in here
     // if @ token, create a token type A with empty string and value for pure number, name and value for symbolic
     auto it = input.begin();
@@ -48,6 +48,7 @@ void TokenStream::add_token(std::string input, int rom_location) {
     // if anything else, create a C type token with string representation included
         default: {
             line.push_back(Token{input, C_INSTRUCTION});
+            break;
         }
     }
 }
@@ -86,7 +87,7 @@ void Parser::parse(Decoder &d, TokenStream &ts) {
     Parser::first_pass(d, ts);
     asm_file.clear();
     asm_file.seekg(0, asm_file.beg);
-    Parser::second_pass(ts);
+    Parser::second_pass(d, ts);
     asm_file.close();
 }
 
@@ -133,15 +134,17 @@ void Parser::first_pass(Decoder &d, TokenStream &ts) {
     }
 }
 
-void Parser::second_pass(TokenStream &ts) {
+void Parser::second_pass(Decoder &d, TokenStream &ts) {
     // go through the file a second time
-    ts.clear_tokens();
+    advance(ts);
     while (has_more_lines()) 
     {
+        if (ts.peek_type() == 'F') {
+            advance(ts);
+            continue;
+        }
         advance(ts);
-                       
+        d.decode(ts);
+        ts.clear_tokens();
     }
-    // construct lines in TokenStream
-    // call coder on the line to transform into binary
-    // coder writes into the output file
 }

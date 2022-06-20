@@ -47,7 +47,7 @@ public:
 class Parser {
 private:
     std::ifstream asm_file {};
-    unsigned int current_rom_location {};
+    unsigned int current_rom_location {0};
 
 public:
     Parser(std::string file_name);

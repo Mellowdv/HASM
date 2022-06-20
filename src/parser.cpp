@@ -110,7 +110,8 @@ void Parser::advance(TokenStream &ts) {
             break;
         }
         ts.add_token(input, current_rom_location);
-        current_rom_location++;
+        if (!(ts.get_token().get_instr_type() == L_INSTRUCTION))
+            current_rom_location++;
     }
     // move the counter forward to keep track of the location
 }
@@ -140,11 +141,13 @@ void Parser::second_pass(Decoder &d, TokenStream &ts) {
     while (has_more_lines()) 
     {
         if (ts.peek_type() == 'F') {
+            ts.clear_tokens();
             advance(ts);
-            continue;
         }
-        advance(ts);
-        d.decode(ts);
-        ts.clear_tokens();
+        else {
+            d.decode(ts);
+            ts.clear_tokens();
+            advance(ts);
+        }
     }
 }

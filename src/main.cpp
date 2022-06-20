@@ -6,10 +6,10 @@
 int main() {
 
     Parser parser("Pong.asm");
-    Decoder decoder;
+    Decoder decoder("Pong.hack");
     TokenStream ts;
     parser.parse(decoder, ts);
-    decoder.print_labels();
-    decoder.print_variables();
+    //decoder.print_labels();
+    //decoder.print_variables();
     return 0;
 }

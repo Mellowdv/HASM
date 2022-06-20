@@ -39,7 +39,7 @@ private:
     std::unordered_map<std::string, unsigned int> variables {};
 
 public:
-    Decoder();
+    Decoder(std::string file_name);
     void decode(TokenStream &ts);
     void add_variable();
     int var_address() const;

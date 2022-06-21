@@ -9,6 +9,9 @@
 // Forward declaration
 class TokenStream;
 
+// Helper function
+
+bool isJump(std::string s);
 
 const int num_of_registers = 16;
 
@@ -44,8 +47,8 @@ public:
     void add_variable();
     int var_address() const;
     std::string symbol();
-    std::string dest();
-    std::string comp();
+    std::string dest(std::string s);
+    std::string comp(std::string s);
     std::string jump();
     void add_label(std::string s, int n);
     void print_labels();

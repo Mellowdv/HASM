@@ -91,6 +91,24 @@ std::string Decoder::dest(std::string s) {
 }
 
 std::string Decoder::comp(std::string s) {
+    std::string prep {};
+    std::string bin_output {};
+
+    size_t prep_begin = s.find('=');
+    for (int i = prep_begin; i < s.length(); i++) {
+        prep += s.at(i);
+    }
+    
+    int int_string_representation {stoi(s)};
+    if (int_string_representation == 1 || int_string_representation == -1 || int_string_representation == 0)
+        bin_output += "1";
+    else if (prep.find("M") != std::string::npos)
+        bin_output += "1";
+    else
+        bin_output += "0";
+    
+    
+
     return "0000000";
 }
 

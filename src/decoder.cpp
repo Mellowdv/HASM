@@ -100,6 +100,7 @@ std::string Decoder::comp(std::string s) {
     }
     
     int int_string_representation {stoi(s)};
+    // checks the 'a' bit 
     if (int_string_representation == 1 || int_string_representation == -1 || int_string_representation == 0)
         bin_output += "1";
     else if (prep.find("M") != std::string::npos)
@@ -107,7 +108,7 @@ std::string Decoder::comp(std::string s) {
     else
         bin_output += "0";
     
-    
+    auto it = s.begin();
 
     return "0000000";
 }

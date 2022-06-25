@@ -3,14 +3,55 @@
 #include <iostream>
 #include <bitset>
 
-// Helper function
+// Helper functions
 
-bool isJump(std::string s) {
+bool is_jump(std::string s) {
     for (auto ch: s) {
         if (ch == ';')
             return true;
     }
     return false;
+}
+
+void load_instructions(std::unordered_map<std::string, std::string> &instructions) {
+    instructions.emplace("0", "101010");
+    instructions.emplace("1", "111111");
+    instructions.emplace("-1", "111010");
+    instructions.emplace("D", "001100");
+    instructions.emplace("A", "110000");
+    instructions.emplace("M", "110000");
+    instructions.emplace("!D", "001101");
+    instructions.emplace("!A", "110001");
+    instructions.emplace("!M", "110001");
+    instructions.emplace("-D", "001111");
+    instructions.emplace("-A", "110011");
+    instructions.emplace("-M", "110011");
+    instructions.emplace("D+1", "011111");
+    instructions.emplace("A+1", "110111");
+    instructions.emplace("M+1", "110111");
+    instructions.emplace("D-1", "001110");
+    instructions.emplace("A-1", "110010");
+    instructions.emplace("M-1", "110010");
+    instructions.emplace("D+A", "000010");
+    instructions.emplace("D+M", "000010");
+    instructions.emplace("D-A", "010011");
+    instructions.emplace("D-M", "010011");
+    instructions.emplace("A-D", "000111");
+    instructions.emplace("M-D", "000111");
+    instructions.emplace("D&A", "000000");
+    instructions.emplace("D&M", "000000");
+    instructions.emplace("D|A", "010101");
+    instructions.emplace("D|M", "010101");
+}
+
+void load_jumps(std::unordered_map<std::string, std::string> &jumps) {
+    jumps.emplace("JGT", "001");
+    jumps.emplace("JEQ", "010");
+    jumps.emplace("JGE", "011");
+    jumps.emplace("JLT", "100");
+    jumps.emplace("JNE", "101");
+    jumps.emplace("JLE", "110");
+    jumps.emplace("JMP", "111");
 }
 
 Decoder::Decoder(std::string file_name) {
@@ -25,6 +66,8 @@ Decoder::Decoder(std::string file_name) {
     variables.emplace("THAT", 4);
     variables.emplace("SCREEN", 16384);
     variables.emplace("SP", 24576);
+    load_instructions(instructions);
+    load_jumps(jumps);
 
     bin_file.open(file_name);
 }
@@ -48,15 +91,14 @@ void Decoder::decode(TokenStream &ts) {
                 break;
             }
             variables.emplace(instruction, current_ram_location);
-            bin_file << "Added variable: " << t.get_symbol() << std::endl;
+            bin_file << std::bitset<16>{variables.at(instruction)} << std::endl;
             current_ram_location++;
             break;
         case L_INSTRUCTION:
-            bin_file << "Encountered L_Instruction" << std::endl;
             break;
         case C_INSTRUCTION:
-            if (isJump(t.get_symbol()))
-                bin_file << "It's a Jump Instruction" << std::endl;
+            if (is_jump(t.get_symbol()))
+                bin_file << "111" << jump(instruction) << std::endl;
             else
                 bin_file << "111" << comp(instruction) << dest(instruction) << "000" << std::endl;
             break;
@@ -94,23 +136,37 @@ std::string Decoder::comp(std::string s) {
     std::string prep {};
     std::string bin_output {};
 
-    size_t prep_begin = s.find('=');
-    for (int i = prep_begin; i < s.length(); i++) {
-        prep += s.at(i);
+    size_t prep_begin = s.find('=') + 1;
+    if (prep_begin != std::string::npos) {
+        for (int i = prep_begin; i < s.length(); i++) {
+            prep += s.at(i);
+        }
     }
-    
-    int int_string_representation {stoi(s)};
-    // checks the 'a' bit 
-    if (int_string_representation == 1 || int_string_representation == -1 || int_string_representation == 0)
-        bin_output += "1";
-    else if (prep.find("M") != std::string::npos)
+    else
+        prep = s;
+
+    if (prep.find('M') != std::string::npos)
         bin_output += "1";
     else
         bin_output += "0";
-    
-    auto it = s.begin();
+    bin_output += instructions.at(prep);
+    return bin_output;
+}
 
-    return "0000000";
+std::string Decoder::jump(std::string s) {
+    std::string prep {};
+    std::string bin_output {};
+    std::string comp {};
+
+    auto prep_start = s.find(';');
+    comp = s.substr(0, prep_start);
+    prep = s.substr(prep_start+1, s.length()-1);
+
+    comp = Decoder::comp(comp);
+    prep = jumps.at(prep);
+
+    bin_output = comp + "000" + prep;
+    return bin_output;
 }
 
 void Decoder::add_label(std::string s, int n) {

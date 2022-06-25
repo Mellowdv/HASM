@@ -40,6 +40,8 @@ private:
     int current_ram_location {16};
     std::unordered_map<std::string, unsigned int> labels {};
     std::unordered_map<std::string, unsigned int> variables {};
+    std::unordered_map<std::string, std::string> instructions {};
+    std::unordered_map<std::string, std::string> jumps {};
 
 public:
     Decoder(std::string file_name);
@@ -49,11 +51,11 @@ public:
     std::string symbol();
     std::string dest(std::string s);
     std::string comp(std::string s);
-    std::string jump();
+    std::string jump(std::string s);
     void add_label(std::string s, int n);
     void print_labels();
     void print_variables();
-    std::unordered_map<std::string, unsigned int> get_labels() const { return labels; };
+    std::unordered_map<std::string, unsigned int> get_labels() const { return labels; }
 };
 
 #endif
